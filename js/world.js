@@ -24,7 +24,7 @@ World.prototype.init = function () {
 	this.scene = new THREE.Scene();
 
 	this.camera = new THREE.PerspectiveCamera(45, ww / wh, 1, 1000);
-	this.camera.position.set(0, 4, 10);
+	this.camera.position.set(0, 20, 20);
 	this.camera.lookAt(this.scene.position);
 
 	this.scene.add(this.camera);
@@ -131,11 +131,18 @@ World.prototype.distribute = function (blocks) {
 		return { block: b, w: b.w + margin, h: b.w + margin };
 	});
 
-	packer.fit(blocks);
+	blocks = packer.fit(blocks);
+	console.log(blocks.filter(function (b) { return !b.fit; }));
+
+	blocks.sort(function (a, b) {
+		return b.w < a.w;
+	});
 
 	blocks = blocks.map(function (b) {
 		// FIXME: for some reason some don't have fit
-		if (!b.fit) b.fit = { x: 0, y: 0 };
+		if (!b.fit) {
+			b.fit = { x: -5, y: -5 };
+		}
 
 		maxx = Math.max(maxx, b.fit.x + b.w);
 		maxz = Math.max(maxz, b.fit.y + b.h);
@@ -148,7 +155,9 @@ World.prototype.distribute = function (blocks) {
 		};
 	}.bind(this));
 
+
 	this.maxx = maxx;
 	this.maxz = maxz;
+	console.log('size ', maxx, maxz);
 	return blocks;
 };
