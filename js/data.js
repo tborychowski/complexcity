@@ -16,5 +16,7 @@ function getData () {
 	// for (; i < l; i++) {
 	// 	srcData.push({ name: 'filename', loc: rand(10, 1000), cplx: rand(1, 20), func: rand(1, 50) });
 	// }
-	return window.data;
+	return window.dataSingle
+		.filter(r => r.loc > 0)
+		.filter(r => r.loc < 5000)
 }

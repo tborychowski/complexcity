@@ -1,0 +1,19 @@
+{
+  "name": "complexcity",
+  "version": "1.0.0",
+  "description": "3d city from your code",
+  "main": "script.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tborychowski/complexcity.git"
+  },
+  "author": "Tom <tborychowski@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tborychowski/complexcity/issues"
+  },
+  "homepage": "https://github.com/tborychowski/complexcity#readme",
+  "dependencies": {
+    "jscomplexity": "^2.0.0"
+  }
+}

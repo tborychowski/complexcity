@@ -1,14 +1,52 @@
-var jscomplexity = require('jscomplexity');
+'use strict';
 
-var glob = '{node_modules/escomplex/**/*,!node_modules/escomplex/node_modules/**}';
+const jscomplexity = require('jscomplexity');
+const fs = require('fs');
+const path = require('path');
 
-jscomplexity(glob).then(res => {
-	var files = res.report.map(f => ({
-		name: f.escapedPath,
-		cplx: f.complexity,
-		func: f.functionCount,
-		loc: f.lineCount
-	}));
+function getDirectories(root) {
+	return fs.readdirSync(root)
+		.filter(folder => {
+			const isNotHidden = folder.indexOf('.') !== 0;
+			const isDir = fs.statSync(path.join(root, folder)).isDirectory();
+			return isDir && isNotHidden;
+		})
+		.map(folder => ({ name: folder, path: root + folder }));
+}
 
-	require('fs').writeFile('data.js', 'var data = ' + JSON.stringify(files));
-});
+function getStats (folder) {
+	return jscomplexity(folder.path + '/**/*.js')
+		.then(res => {
+			folder.files = res.report.map(f => ({
+				name: f.escapedPath,
+				cplx: f.complexity,
+				func: Math.max(f.functionCount, 1),
+				loc: f.lineCount
+			}));
+			return folder;
+		});
+}
+
+function multiple() {
+	const root = 'node_modules/jscomplexity/node_modules/';
+	const folders = getDirectories(root).map(getStats);
+	Promise.all(folders).then(res => {
+		fs.writeFile('data-multi.js', 'var dataMulti = ' + JSON.stringify(res));
+	});
+}
+
+function single() {
+	jscomplexity('node_modules/jscomplexity/**/*.js').then(res => {
+		var files = res.report.map(f => ({
+			name: f.escapedPath,
+			cplx: f.complexity,
+			func: Math.max(f.functionCount, 1),
+			loc: f.lineCount
+		}));
+
+		require('fs').writeFile('data-single.js', 'var dataSingle = ' + JSON.stringify(files));
+	});
+}
+
+multiple();
+single();

@@ -41,7 +41,7 @@ class World {
 
 		this.scene = new THREE.Scene();
 
-		this.camera = new THREE.PerspectiveCamera(45, ww / wh, 1, 1000);
+		this.camera = new THREE.PerspectiveCamera(45, ww / wh, 0.01, 1000);
 		this.camera.position.set(0, 10, 10);
 		this.camera.lookAt(this.scene.position);
 
@@ -65,7 +65,7 @@ class World {
 	// no of functions => w
 	// complexity / function => color
 	translate(data) {
-		var scale = { loc: 5, cplx: 5, func: 3 };
+		var scale = { loc: 5, cplx: 5, func: 5 };
 		var max = getMaxes({ loc: 0, cplx: 0, func: 0 }, data);
 		return data.map(d => {
 			return {
@@ -227,6 +227,9 @@ class World {
 				this.intersected = intersects[0].object;
 
 				if (Object.keys(this.intersected.userData).length) {
+
+					console.log(this.intersected.userData);
+
 					// store color of closest object (for later restoration)
 					this.intersected.currentHex = this.intersected.material.color.getHex();
 					// set a new color for closest object
