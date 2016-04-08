@@ -1,52 +1,39 @@
 'use strict';
 
+const directoryTree = require('directory-tree');
 const jscomplexity = require('jscomplexity');
 const fs = require('fs');
-const path = require('path');
 
-function getDirectories(root) {
-	return fs.readdirSync(root)
-		.filter(folder => {
-			const isNotHidden = folder.indexOf('.') !== 0;
-			const isDir = fs.statSync(path.join(root, folder)).isDirectory();
-			return isDir && isNotHidden;
-		})
-		.map(folder => ({ name: folder, path: root + folder }));
-}
+function getStats (item) {
+	if (item.children) {
+		return Promise.all(item.children.map(getStats))
+			.then(ch => {
+				item.children = ch;
+				return item;
+			});
+	}
 
-function getStats (folder) {
-	return jscomplexity(folder.path + '/**/*.js')
+	return jscomplexity(item.path)
 		.then(res => {
-			folder.files = res.report.map(f => ({
-				name: f.escapedPath,
-				cplx: f.complexity,
-				func: Math.max(f.functionCount, 1),
-				loc: f.lineCount
-			}));
-			return folder;
+			const r = res.report[0] || { complexity: 0, functionCount: 0, lineCount: 0 };
+			Object.assign(item, {
+				cplx: r.complexity,
+				func: Math.max(r.functionCount, 1),
+				loc: r.lineCount
+			});
+			return item;
 		});
 }
 
+
 function multiple() {
-	const root = 'node_modules/jscomplexity/node_modules/';
-	const folders = getDirectories(root).map(getStats);
-	Promise.all(folders).then(res => {
-		fs.writeFile('data-multi.js', 'var dataMulti = ' + JSON.stringify(res));
-	});
-}
+	const tree = directoryTree('./node_modules/jscomplexity/node_modules', ['.js']);
 
-function single() {
-	jscomplexity('node_modules/jscomplexity/**/*.js').then(res => {
-		var files = res.report.map(f => ({
-			name: f.escapedPath,
-			cplx: f.complexity,
-			func: Math.max(f.functionCount, 1),
-			loc: f.lineCount
-		}));
-
-		require('fs').writeFile('data-single.js', 'var dataSingle = ' + JSON.stringify(files));
-	});
+	getStats(tree)
+		.then(res => {
+			fs.writeFile('data-multi.js', 'var dataMulti = ' + JSON.stringify(res));
+		})
+		.catch(console.log.bind(console))
 }
 
 multiple();
-single();
