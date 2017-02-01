@@ -14,7 +14,7 @@
   },
   "homepage": "https://github.com/tborychowski/complexcity#readme",
   "dependencies": {
-    "directory-tree": "git+http://github.com/tborychowski/node-directory-tree.git#9c5786e",
+    "directory-tree": "^1.0.0",
     "jscomplexity": "^2.0.0"
   }
 }
