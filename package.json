@@ -7,12 +7,8 @@
     "type": "git",
     "url": "git+https://github.com/tborychowski/complexcity.git"
   },
-  "author": "Tom <tborychowski@gmail.com>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/tborychowski/complexcity/issues"
-  },
-  "homepage": "https://github.com/tborychowski/complexcity#readme",
+  "author": "Tom",
+  "license": "GPL-3.0-or-later",
   "dependencies": {
     "jscomplexity": "^2.0.0"
   }
